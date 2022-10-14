@@ -14,13 +14,12 @@ export const getUsersSlice = createAsyncSlice<RequestPayload, SuccessPayload, Er
   name: 'getUsers',
 });
 
-export const getUserCompaniesSlice = createAsyncListSlice({ name: 'getCompaiesByUserIdSlice' })
-
 /* RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId:
 these are optional since we always should pass an id of parent list by default
 */
+export const getUserCompaniesSlice = createAsyncListSlice<RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId>({ name: 'getCompaiesByUserIdSlice' })
 
-export const usersReducer = combineReducers<RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId>({
+export const usersReducer = combineReducers({
   getUsers: debtsSlice.reducer,
   getUserCompanies: createDebtSlice.reducer,
   payTheDebtOff: payTheDebtOffSlice.reducer,
