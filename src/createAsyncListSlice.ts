@@ -1,13 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Draft } from 'immer';
 
-import {
-  isError,
-  isProcessing,
-  isSuccess,
-  _AsyncState,
-  _CreateSliceOptions,
-} from './createAsyncSlice';
+import { _AsyncState, _CreateSliceOptions } from './createAsyncSlice';
 
 export type _AsyncListState<S, E> = {
   [key: string]: _AsyncState<S, E> | undefined;
@@ -106,36 +100,3 @@ export const createAsyncListSlice = <
     },
   };
 };
-
-export const isListItemProcessing = (
-  listAsyncState?: _AsyncListState<unknown, unknown>,
-  payload?: DefaultListPayload
-) =>
-  !!(
-    payload?.id &&
-    listAsyncState &&
-    listAsyncState[payload?.id] &&
-    isProcessing(listAsyncState[payload.id] as _AsyncState<unknown, unknown>)
-  );
-
-export const isListItemSuccess = (
-  listAsyncState?: _AsyncListState<unknown, unknown>,
-  payload?: DefaultListPayload
-) =>
-  !!(
-    payload?.id &&
-    listAsyncState &&
-    listAsyncState[payload?.id] &&
-    isSuccess(listAsyncState[payload.id] as _AsyncState<unknown, unknown>)
-  );
-
-export const isListItemError = (
-  listAsyncState?: _AsyncListState<unknown, unknown>,
-  payload?: DefaultListPayload
-) =>
-  !!(
-    payload?.id &&
-    listAsyncState &&
-    listAsyncState[payload?.id] &&
-    isError(listAsyncState[payload.id] as _AsyncState<unknown, unknown>)
-  );

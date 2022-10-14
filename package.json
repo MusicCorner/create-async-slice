@@ -1,6 +1,6 @@
 {
   "name": "create-async-slice",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -11,8 +11,8 @@
     "lint-fix": "yarn lint --fix",
     "check-types": "tsc --noEmit",
     "prepare": "husky install & npm run build",
-    "version" : "npm run precommit && git add .",
-    "postversion" : "git push && git push --tags",
+    "version": "npm run precommit && git add . && git commit -m patch",
+    "postversion": "git push && git push --tags",
     "precommit": "npx lint-staged"
   },
   "lint-staged": {
@@ -26,13 +26,20 @@
     "type": "git",
     "url": "git+https://github.com/MusicCorner/create-async-slice.git"
   },
-  "keywords": ["redux-toolkit", "redux", "async slices", "redux async actions"],
+  "keywords": [
+    "redux-toolkit",
+    "redux",
+    "async slices",
+    "redux async actions"
+  ],
   "author": "music_corner",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/MusicCorner/create-async-slice/issues"
   },
-  "files": ["lib/**/*"],
+  "files": [
+    "lib/**/*"
+  ],
   "homepage": "https://github.com/MusicCorner/create-async-slice#readme",
   "devDependencies": {
     "eslint": "^7.32.0",
