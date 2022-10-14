@@ -40,7 +40,7 @@ export const reducers = {
 _src/ducks/users/users.selectors.ts_
 
 ```javascript
-import { isProcessing } from 'create-async-slice';
+import { isProcessing, isListItemProcessing } from 'create-async-slice';
 
 export const selectUsersData = state: RootState => state.users.getUsers.value || []
 
