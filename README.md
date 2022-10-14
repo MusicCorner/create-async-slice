@@ -42,13 +42,17 @@ _src/ducks/users/users.selectors.ts_
 ```javascript
 import { isProcessing, isListItemProcessing } from 'create-async-slice';
 
-export const selectUsersData = state: RootState => state.users.getUsers.value || []
+export const selectUsersData = (state: RootState) =>
+  state.users.getUsers.value || [];
 
-export const selectIsGetUsersProcessing = isProcessing(state.users.getUsers)
+export const selectIsGetUsersProcessing = (state: RootState) =>
+  isProcessing(state.users.getUsers);
 
-export const selectUserCompanyById = (state, { id }) => state.users.getUserCompanies[id]
+export const selectUserCompanyById = (state: RootState, { id }) =>
+  state.users.getUserCompanies[id];
 
-export const selectIsGetUserCompanyProcessing = (state, { id }) => isListItemProcessing(selectUserCompanyById(state), { id });
+export const selectIsGetUserCompanyProcessing = (state: RootState, { id }) =>
+  isListItemProcessing(selectUserCompanyById(state), { id });
 ```
 
 _src/components/Users.ts_
