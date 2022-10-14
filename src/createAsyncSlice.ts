@@ -76,11 +76,11 @@ export const createAsyncSlice = <
         ...options.reducers,
       },
     }),
-    // actionNames: {
-    //   request: `async/${options.name}/request`,
-    //   success: `async/${options.name}/success`,
-    //   error: `async/${options.name}/error`,
-    // },
+    actionNames: {
+      request: `async/${options.name}/request`,
+      success: `async/${options.name}/success`,
+      error: `async/${options.name}/error`,
+    },
   };
 };
 

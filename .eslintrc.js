@@ -35,8 +35,8 @@ module.exports = {
         warnOnUnassignedImports: true,
       },
     ],
+    "no-param-reassign": "off",
     "prettier/prettier": ["error", { singleQuote: true }],
-    quotes: [2, "single"],
   },
   settings: {
     "import/internal-regex": "^@.*",

@@ -1,16 +1,41 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "declaration": true,
-    "outDir": "./lib",
-    "strict": true
-  },
-  "include": ["src"],
-  "paths": {
-    "@*": [
-      "./src/*"
-    ]
-  },
-  "exclude": ["node_modules", "**/__tests__/*"]
+	"compilerOptions": {
+		"resolveJsonModule": true,
+		"target": "es5",
+		"module": "es6",
+		"moduleResolution": "node",
+		"declaration": true,
+		"strict": true,
+		"noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
+		"strictNullChecks": true /* Enable strict null checks. */,
+		"strictFunctionTypes": true /* Enable strict checking of function types. */,
+		"noUnusedLocals": false /* Report errors on unused locals. */,
+		"noUnusedParameters": false /* Report errors on unused parameters. */,
+		"noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
+		"noFallthroughCasesInSwitch": true /* Report errors for fallthrough cases in switch statement. */,
+		"importHelpers": true,
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"experimentalDecorators": true,
+		"sourceMap": true,
+		"outDir": "./lib",
+		"paths": {
+			"@*": [
+				"./src/*"
+			]
+		},
+		"lib": [
+			"ES6",
+			"dom"
+		],
+	},
+	"include": [
+		"./src/**/*.ts",
+		"./declaration.d.ts"
+	],
+	"exclude": [
+		"./src/node_modules",
+		"**/*.test.ts"
+	]
 }
