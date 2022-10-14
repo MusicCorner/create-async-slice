@@ -20,9 +20,8 @@ these are optional since we always should pass an id of parent list by default
 export const getUserCompaniesSlice = createAsyncListSlice<RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId>({ name: 'getCompaiesByUserIdSlice' })
 
 export const usersReducer = combineReducers({
-  getUsers: debtsSlice.reducer,
-  getUserCompanies: createDebtSlice.reducer,
-  payTheDebtOff: payTheDebtOffSlice.reducer,
+  getUsers: getUsersSlice.reducer,
+  getUserCompanies: getUserCompaniesSlice.reducer
 });
 ```
 
@@ -41,17 +40,22 @@ _src/ducks/users/users.selectors.ts_
 ```javascript
 import { isProcessing, isListItemProcessing } from 'create-async-slice';
 
-export const selectUsersData = (state: RootState) =>
-  state.users.getUsers.value || [];
+export const selectGetUsers = (state: RootState) => state.users.getUsers;
+
+export const selectGetUsersData = (state: RootState) =>
+  selectGetUsers(state).value || [];
 
 export const selectIsGetUsersProcessing = (state: RootState) =>
-  isProcessing(state.users.getUsers);
+  isProcessing(selectGetUsers(state));
 
-export const selectUserCompanyById = (state: RootState, { id }) =>
+export const selectGetUserCompaniesById = (state: RootState, { id }) =>
   state.users.getUserCompanies[id];
 
 export const selectIsGetUserCompanyProcessing = (state: RootState, { id }) =>
-  isListItemProcessing(selectUserCompanyById(state), { id });
+  isListItemProcessing(selectGetUserCompaniesById(state), { id });
+
+export const selectGetUserCompaniesByIdData = (state: RootState, { id }) =>
+  selectGetUserCompaniesById(state, { id }).value || [];
 ```
 
 _src/components/Users.ts_
@@ -60,14 +64,14 @@ _src/components/Users.ts_
 import React, { useSelector, useDispatch, useEffect } from 'react';
 
 import { getUsersSlice } from '@ducks/users/users.slice';
-import { isGetUsersProcessing, selectUsersData } from '@ducks/users/users.selectors';
+import { selectIsGetUsersProcessing, selectGetUsersData } from '@ducks/users/users.selectors';
 
 export const Users = () => {
   const dispatch = useDispatch();
 
-  const isProcessing = useSelector(isGetUsersProcessing);
+  const isProcessing = useSelector(selectIsGetUsersProcessing);
 
-  const usersData = useSelector(selectUsersData)
+  const usersData = useSelector(selectGetUsersData)
 
   useEffect(() => {
     dispatch(getUsersSlice.actions.request());
@@ -89,14 +93,14 @@ _src/components/User.ts_
 import React, { useSelector, useDispatch, useEffect } from 'react';
 
 import { getUserCompaniesSlice } from '@ducks/users/users.slice';
-import { isGetUserCompaniesProcessing } from '@ducks/users/users.selectors';
+import { selectIsGetUserCompanyProcessing, selectGetUserCompaniesByIdData } from '@ducks/users/users.selectors';
 
 export const User = ({ id, name }) => {
   const dispatch = useDispatch();
 
-  const isProcessing = useSelector(state => isGetUserCompanniesProcessing(state, { id }));
+  const isProcessing = useSelector(state => selectIsGetUserCompanyProcessing(state, { id }));
 
-  const companiesData = useSelector(state => selectUserCompaniesData(state, { id }))
+  const companiesData = useSelector(state => selectGetUserCompaniesByIdData(state, { id }));
 
   useEffect(() => {
     dispatch(getUserCompaniesSlice.actions.request({ id }));
