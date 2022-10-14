@@ -1,6 +1,6 @@
 {
   "name": "create-async-slice",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -27,7 +27,7 @@
     "url": "git+https://github.com/MusicCorner/create-async-slice.git"
   },
   "keywords": ["redux-toolkit", "redux", "async slices", "redux async actions"],
-  "author": "",
+  "author": "music_corner",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/MusicCorner/create-async-slice/issues"
