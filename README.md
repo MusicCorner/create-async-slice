@@ -2,9 +2,53 @@
 
 ## Helper for creating async slices with redux toolkit to avoid boilerplates
 
+### API
+
+#### createAsyncSlice
+Returns redux-toolit slice object with 4 actions:  
+1. `request` - to dispatch request with payload for fetching data and set isProcessing: `true`
+2. `success` - to fulfill your store with success data from API
+3. `error` - to fulfill data with error from API response
+4. `reset` - to reset store's state
+
+#### createAsyncListSlice
+_Stands for creating relations between async states or for making complicated async lists slices. Example: you're users are toggleable sections and when you toggle each section - you need to load company info for that certain user. So there's multiple loading companies for each opened user at the same time_
+
+Returns redux-toolit slice object with 4 actions:  
+1. `request` - to dispatch request with payload for fetching data and set isProcessing: `true`
+Expects `{ id }` as default. `id` is id of item in list which needs to get additional data e.g. company user id.
+1. `success` - to fulfill your store with success data from API. Expects `{ id, value }` as default. `value` is your data you want put into your redux store
+2. `error` - to fulfill data with error from API response. Expects `{ id, error }` as default.
+3. `reset` - to reset store's state. Expects `{ id }` as default.
+
+#### How does async slice's state look like?
+```javascript
+// state.users
+// createAsyncSlice:
+{
+  getUsers: {
+    value: [{ name: 'Test user', id: 'user-id-1' }],
+    isSuccess: true,
+    isProcessing: false,
+    error: null
+  }
+}
+
+// createAsyncListSlice:
+{
+  getUserCompanies: {
+    ['user-id-1']: {
+      value: [{ name: 'Test Company', id: 'company-id-1' }],
+      isSuccess: true,
+      isProcessing: false,
+      error: null
+    }
+  }
+}
+```
 ### Usage
 
-_src/ducks/users/users.slices.ts_
+#### src/ducks/users/users.slices.ts
 
 ```javascript
 import { combineReducers } from 'redux';
@@ -25,7 +69,41 @@ export const usersReducer = combineReducers({
 });
 ```
 
-_src/store/reducers.ts_
+#### src/ducks/users/users.sagas.ts
+
+```javascript
+
+function* getUserCompaniesSaga({ payload }) {
+  // id - companyId
+  const { id } = payload;
+
+  try {
+    const { data } = yield call(usersApi.getUserCompanies, id);
+
+    yield put(getUserCompaniesSlice.actions.success(data));
+  } catch (e) {
+    yield put(getUserCompaniesSlice.actions.error(e.message));
+  }
+}
+
+function* getUsersSaga() {
+  try {
+    const { data } = yield call(usersApi.getUsers);
+
+    yield put(getUsersSlice.actions.success(data));
+  } catch (e) {
+    yield put(getUsersSlice.actions.error(e.message));
+  }
+}
+
+export function* usersSagas() {
+  yield takeAll(getUsersSlice.actions.request, getUsersSaga);
+
+  yield takeAll(getUserCompaniesSlice.actions.request, getUserCompaniesSaga);
+}
+```
+
+#### src/store/reducers.ts
 
 ```javascript
 import { usersReducer } from '@ducks/users/users.slices';
@@ -35,7 +113,7 @@ export const reducers = {
 };
 ```
 
-_src/ducks/users/users.selectors.ts_
+#### src/ducks/users/users.selectors.ts
 
 ```javascript
 import { isProcessing, isListItemProcessing } from 'create-async-slice';
@@ -58,7 +136,7 @@ export const selectGetUserCompaniesByIdData = (state: RootState, { id }) =>
   selectGetUserCompaniesById(state, { id }).value || [];
 ```
 
-_src/components/Users.ts_
+#### src/components/Users.ts
 
 ```javascript
 import React, { useSelector, useDispatch, useEffect } from 'react';
@@ -87,7 +165,7 @@ export const Users = () => {
 }
 ```
 
-_src/components/User.ts_
+#### src/components/User.ts
 
 ```javascript
 import React, { useSelector, useDispatch, useEffect } from 'react';
