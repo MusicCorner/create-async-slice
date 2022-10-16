@@ -1,46 +1,71 @@
-import { DefaultListPayload, _AsyncListState } from '@createAsyncListSlice';
-import { _AsyncState } from '@createAsyncSlice';
-
-export const isProcessing = (asyncState: _AsyncState<unknown, unknown>) =>
-  asyncState.isProcessing;
-
-export const isSuccess = (asyncState: _AsyncState<unknown, unknown>) =>
-  !asyncState.isProcessing && asyncState.isSuccess;
-
-export const isError = (asyncState: _AsyncState<unknown, unknown>) =>
-  !asyncState.isProcessing && !!asyncState.error;
+import { DefaultListPayload, AsyncListState } from '@createAsyncListSlice';
+import { AsyncState } from '@createAsyncSlice';
 
 export const pure = <T>(state: T) => state;
 
+export const selectAsyncStateValue = (
+  asyncState: AsyncState<unknown, unknown>
+) => asyncState.value;
+
+export const isProcessing = (asyncState: AsyncState<unknown, unknown>) =>
+  asyncState.isProcessing;
+
+export const isSuccess = (asyncState: AsyncState<unknown, unknown>) =>
+  !asyncState.isProcessing && asyncState.isSuccess;
+
+export const selectAsyncStateError = (
+  asyncState: AsyncState<unknown, unknown>
+) => (!asyncState.isProcessing && asyncState.error) || null;
+
+export const isError = (asyncState: AsyncState<unknown, unknown>) =>
+  !asyncState.isProcessing && !!asyncState.error;
+
+export const selectAsyncListStateValue = (
+  listAsyncState?: AsyncListState<unknown, unknown>,
+  payload?: DefaultListPayload
+) =>
+  (listAsyncState && payload?.id && listAsyncState[payload.id]?.value) || null;
+
 export const isListItemProcessing = (
-  listAsyncState?: _AsyncListState<unknown, unknown>,
+  listAsyncState?: AsyncListState<unknown, unknown>,
   payload?: DefaultListPayload
 ) =>
   !!(
     payload?.id &&
     listAsyncState &&
     listAsyncState[payload?.id] &&
-    isProcessing(listAsyncState[payload.id] as _AsyncState<unknown, unknown>)
+    isProcessing(listAsyncState[payload.id] as AsyncState<unknown, unknown>)
   );
 
 export const isListItemSuccess = (
-  listAsyncState?: _AsyncListState<unknown, unknown>,
+  listAsyncState?: AsyncListState<unknown, unknown>,
   payload?: DefaultListPayload
 ) =>
   !!(
     payload?.id &&
     listAsyncState &&
     listAsyncState[payload?.id] &&
-    isSuccess(listAsyncState[payload.id] as _AsyncState<unknown, unknown>)
+    isSuccess(listAsyncState[payload.id] as AsyncState<unknown, unknown>)
+  );
+
+export const selectListItemError = (
+  listAsyncState?: AsyncListState<unknown, unknown>,
+  payload?: DefaultListPayload
+) =>
+  payload?.id &&
+  listAsyncState &&
+  listAsyncState[payload?.id] &&
+  selectAsyncStateError(
+    listAsyncState[payload.id] as AsyncState<unknown, unknown>
   );
 
 export const isListItemError = (
-  listAsyncState?: _AsyncListState<unknown, unknown>,
+  listAsyncState?: AsyncListState<unknown, unknown>,
   payload?: DefaultListPayload
 ) =>
   !!(
     payload?.id &&
     listAsyncState &&
     listAsyncState[payload?.id] &&
-    isError(listAsyncState[payload.id] as _AsyncState<unknown, unknown>)
+    isError(listAsyncState[payload.id] as AsyncState<unknown, unknown>)
   );
