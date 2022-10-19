@@ -27,7 +27,7 @@ export interface CreateAsyncSliceOptions<State> {
   reducers?: ValidateSliceCaseReducers<State, SliceCaseReducers<State>>;
   initialState?: State;
   name: string;
-  selectorsStatePath: string;
+  selectorsStatePath?: string;
 }
 
 export const createAsyncSlice = <
@@ -51,6 +51,26 @@ export const createAsyncSlice = <
     [key: string]: {
       [key: string]: AsyncState<SuccessPayload, ErrorPayload> | any;
     };
+  };
+
+  const selectors = selectorsStatePath && {
+    asyncState: (state: SelectorsState) =>
+      state[selectorsStatePath][options.name] as AsyncState<
+        SuccessPayload,
+        ErrorPayload
+      >,
+    value: (state: SelectorsState): SuccessPayload | null =>
+      selectAsyncStateValue(
+        state[selectorsStatePath][options.name]
+      ) as SuccessPayload | null,
+    error: (state: SelectorsState): ErrorPayload | null =>
+      selectAsyncStateError(
+        state[selectorsStatePath][options.name]
+      ) as ErrorPayload | null,
+    isSuccess: (state: SelectorsState) =>
+      isSuccess(state[selectorsStatePath][options.name]),
+    isError: (state: SelectorsState) =>
+      isError(state[selectorsStatePath][options.name]),
   };
 
   return {
@@ -92,24 +112,6 @@ export const createAsyncSlice = <
       success: `async/${options.name}/success`,
       error: `async/${options.name}/error`,
     },
-    selectors: {
-      asyncState: (state: SelectorsState) =>
-        state[selectorsStatePath][options.name] as AsyncState<
-          SuccessPayload,
-          ErrorPayload
-        >,
-      value: (state: SelectorsState): SuccessPayload | null =>
-        selectAsyncStateValue(
-          state[selectorsStatePath][options.name]
-        ) as SuccessPayload | null,
-      error: (state: SelectorsState): ErrorPayload | null =>
-        selectAsyncStateError(
-          state[selectorsStatePath][options.name]
-        ) as ErrorPayload | null,
-      isSuccess: (state: SelectorsState) =>
-        isSuccess(state[selectorsStatePath][options.name]),
-      isError: (state: SelectorsState) =>
-        isError(state[selectorsStatePath][options.name]),
-    },
+    selectors,
   };
 };

@@ -1,4 +1,4 @@
-import { DefaultListPayload, AsyncListState } from '@createAsyncListSlice';
+import { DefaultListPayload, AsyncListState } from '@createAsyncMappingSlice';
 import { AsyncState } from '@createAsyncSlice';
 
 export const pure = <T>(state: T) => state;

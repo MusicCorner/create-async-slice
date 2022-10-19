@@ -11,7 +11,7 @@ Returns redux-toolit slice object with 4 actions:
 3. `error` - to fulfill data with error from API response
 4. `reset` - to reset store's state
 
-#### createAsyncListSlice
+#### createAsyncMappingSlice
 _Stands for creating relations between async states or for making complicated async lists slices. Example: you're users are toggleable sections and when you toggle each section - you need to load company info for that certain user. So there's multiple loading companies for each opened user at the same time_
 
 Returns redux-toolit slice object with 4 actions:  
@@ -34,7 +34,7 @@ Expects `{ id }` as default. `id` is id of item in list which needs to get addit
   }
 }
 
-// createAsyncListSlice:
+// createAsyncMappingSlice:
 {
   getUserCompanies: {
     ['user-id-1']: {
@@ -61,7 +61,7 @@ export const getUsersSlice = createAsyncSlice<RequestPayload, SuccessPayload, Er
 /* RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId:
 these are optional since we always should pass an id of parent list by default
 */
-export const getUserCompaniesSlice = createAsyncListSlice<RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId>({ name: 'getCompaiesByUserId' })
+export const getUserCompaniesSlice = createAsyncMappingSlice<RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId>({ name: 'getCompaiesByUserId' })
 
 export const usersReducer = combineReducers({
   getUsers: getUsersSlice.reducer,
@@ -193,3 +193,17 @@ export const User = ({ id, name }) => {
   )
 }
 ```
+
+### API
+#### Async Slice Options:
+`createAsyncSlice` accepts all `createSlice` options and following:
+
+| Option key | Description | Default Value |
+| ------------- | ------------- | ------------- |
+| `selectorsStatePath`  | `string`, `optional`   Redux state key for selector. E.g: `selectorsStatePath`: 'users' will make all selectors in this slice be `state => state.users[asyncSliceName]`  | `undefined` |
+
+___
+`createAsyncMappingsSlice` accepts all `createAsyncSlice` options and following:
+| Option key | Description | Default Value |
+| ------------- | ------------- | ------------- |
+| `mappingsAmountLimit`  | `number`, `optional`   Limits max amount of items stored in slices state (to avoid memory leak)  | `undefined`  |

@@ -26,7 +26,12 @@ export interface DefaultListErrorPayload<T> extends DefaultListPayload {
   error: T;
 }
 
-export const createAsyncListSlice = <
+export interface CreateAsyncMappingsOptions<S>
+  extends CreateAsyncSliceOptions<S> {
+  mappingsAmountLimit?: number;
+}
+
+export const createAsyncMappingSlice = <
   RequestPayload extends DefaultListPayload = DefaultListPayload,
   SuccessValue = unknown,
   ErrorValue = string,
@@ -34,8 +39,9 @@ export const createAsyncListSlice = <
   ErrorPayload extends DefaultListErrorPayload<ErrorValue> = DefaultListErrorPayload<ErrorValue>
 >({
   selectorsStatePath,
+  mappingsAmountLimit,
   ...options
-}: CreateAsyncSliceOptions<AsyncListState<SuccessValue, ErrorValue>>) => {
+}: CreateAsyncMappingsOptions<AsyncListState<SuccessValue, ErrorValue>>) => {
   const initialState: AsyncListState<SuccessValue, ErrorValue> = {
     // [id]: {
     // 	isProcessing: false,
@@ -43,6 +49,38 @@ export const createAsyncListSlice = <
     // 	error: null,
     // 	value: null
     // }
+  };
+
+  const selectors = selectorsStatePath && {
+    asyncListState: (state: SelectorsState) =>
+      state[selectorsStatePath][options.name] as AsyncListState<
+        SuccessValue,
+        ErrorValue
+      >,
+    asyncState: (state: SelectorsState, payload: DefaultListPayload) =>
+      (
+        state[selectorsStatePath][options.name] as AsyncListState<
+          SuccessValue,
+          ErrorValue
+        >
+      )[payload.id],
+    value: (
+      state: SelectorsState,
+      payload: DefaultListPayload
+    ): SuccessPayload =>
+      selectAsyncListStateValue(
+        state[selectorsStatePath][options.name],
+        payload
+      ) as SuccessPayload,
+    error: (state: SelectorsState, payload: DefaultListPayload): ErrorPayload =>
+      selectListItemError(
+        state[selectorsStatePath][options.name],
+        payload
+      ) as ErrorPayload,
+    isSuccess: (state: SelectorsState, payload: DefaultListPayload) =>
+      isListItemSuccess(state[selectorsStatePath][options.name], payload),
+    isError: (state: SelectorsState, payload: DefaultListPayload) =>
+      isListItemError(state[selectorsStatePath][options.name], payload),
   };
 
   type SelectorsState = {
@@ -73,14 +111,28 @@ export const createAsyncListSlice = <
         },
         request: (state, action: PayloadAction<Draft<RequestPayload>>) => {
           const { id } = action.payload;
-
-          state[id] = {
+          const newMappingItem = {
             ...state[id],
             value: state[id]?.value || null,
             isProcessing: true,
             isSuccess: false,
             error: null,
           };
+
+          const mappingsAmount = Object.keys(state).length;
+
+          if (
+            mappingsAmountLimit !== undefined &&
+            mappingsAmountLimit === mappingsAmount
+          ) {
+            return {
+              [id]: newMappingItem,
+            };
+          }
+
+          state[id] = newMappingItem;
+
+          return state;
         },
         success: (state, action: PayloadAction<Draft<SuccessPayload>>) => {
           const { id, value } = action.payload;
@@ -112,39 +164,6 @@ export const createAsyncListSlice = <
       success: `async/${options.name}/success`,
       error: `async/${options.name}/error`,
     },
-    selectors: {
-      asyncListState: (state: SelectorsState) =>
-        state[selectorsStatePath][options.name] as AsyncListState<
-          SuccessValue,
-          ErrorValue
-        >,
-      asyncState: (state: SelectorsState, payload: DefaultListPayload) =>
-        (
-          state[selectorsStatePath][options.name] as AsyncListState<
-            SuccessValue,
-            ErrorValue
-          >
-        )[payload.id],
-      value: (
-        state: SelectorsState,
-        payload: DefaultListPayload
-      ): SuccessPayload =>
-        selectAsyncListStateValue(
-          state[selectorsStatePath][options.name],
-          payload
-        ) as SuccessPayload,
-      error: (
-        state: SelectorsState,
-        payload: DefaultListPayload
-      ): ErrorPayload =>
-        selectListItemError(
-          state[selectorsStatePath][options.name],
-          payload
-        ) as ErrorPayload,
-      isSuccess: (state: SelectorsState, payload: DefaultListPayload) =>
-        isListItemSuccess(state[selectorsStatePath][options.name], payload),
-      isError: (state: SelectorsState, payload: DefaultListPayload) =>
-        isListItemError(state[selectorsStatePath][options.name], payload),
-    },
+    selectors,
   };
 };
