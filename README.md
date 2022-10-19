@@ -56,12 +56,13 @@ import { createAsyncSlice } from 'create-async-slice';
 
 export const getUsersSlice = createAsyncSlice<RequestPayload, SuccessPayload, ErrorPayload>({
   name: 'getUsers',
+  selectorsStatePath: 'users'
 });
 
 /* RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId:
 these are optional since we always should pass an id of parent list by default
 */
-export const getUserCompaniesSlice = createAsyncMappingSlice<RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId>({ name: 'getCompaiesByUserId' })
+export const getUserCompaniesSlice = createAsyncMappingSlice<RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId>({ name: 'getCompaiesByUserId', selectorsStatePath: 'users' })
 
 export const usersReducer = combineReducers({
   getUsers: getUsersSlice.reducer,
@@ -113,29 +114,6 @@ export const reducers = {
 };
 ```
 
-#### src/ducks/users/users.selectors.ts
-
-```javascript
-import { isProcessing, isListItemProcessing } from 'create-async-slice';
-
-export const selectGetUsers = (state: RootState) => state.users.getUsers;
-
-export const selectGetUsersData = (state: RootState) =>
-  selectGetUsers(state).value || [];
-
-export const selectIsGetUsersProcessing = (state: RootState) =>
-  isProcessing(selectGetUsers(state));
-
-export const selectGetUserCompaniesById = (state: RootState, { id }) =>
-  state.users.getUserCompanies[id];
-
-export const selectIsGetUserCompanyProcessing = (state: RootState, { id }) =>
-  isListItemProcessing(selectGetUserCompaniesById(state), { id });
-
-export const selectGetUserCompaniesByIdData = (state: RootState, { id }) =>
-  selectGetUserCompaniesById(state, { id }).value || [];
-```
-
 #### src/components/Users.ts
 
 ```javascript
@@ -147,9 +125,9 @@ import { selectIsGetUsersProcessing, selectGetUsersData } from '@ducks/users/use
 export const Users = () => {
   const dispatch = useDispatch();
 
-  const isProcessing = useSelector(selectIsGetUsersProcessing);
+  const isProcessing = useSelector(getUsersSlice.selectors?.isProcessing);
 
-  const usersData = useSelector(selectGetUsersData)
+  const usersData = useSelector(getUsersSlice.selectors?.value)
 
   useEffect(() => {
     dispatch(getUsersSlice.actions.request());
@@ -176,9 +154,9 @@ import { selectIsGetUserCompanyProcessing, selectGetUserCompaniesByIdData } from
 export const User = ({ id, name }) => {
   const dispatch = useDispatch();
 
-  const isProcessing = useSelector(state => selectIsGetUserCompanyProcessing(state, { id }));
+  const isProcessing = useSelector(state => getUserCompaniesSlice.selectors?.isProcessing(state, { id }));
 
-  const companiesData = useSelector(state => selectGetUserCompaniesByIdData(state, { id }));
+  const companiesData = useSelector(state => getUserCompaniesSlice.selectors?.value(state, { id }));
 
   useEffect(() => {
     dispatch(getUserCompaniesSlice.actions.request({ id }));
@@ -200,10 +178,10 @@ export const User = ({ id, name }) => {
 
 | Option key | Description | Default Value |
 | ------------- | ------------- | ------------- |
-| `selectorsStatePath`  | `string`, `optional`   Redux state key for selector. E.g: `selectorsStatePath`: 'users' will make all selectors in this slice be `state => state.users[asyncSliceName]`  | `undefined` |
+| `selectorsStatePath`  | `string`, `optional`. Redux state key for selector. E.g: `selectorsStatePath`: `'users'` will make all selectors in this slice be `state => state.users[asyncSliceName]`  | `undefined` |
 
 ___
 `createAsyncMappingsSlice` accepts all `createAsyncSlice` options and following:
 | Option key | Description | Default Value |
 | ------------- | ------------- | ------------- |
-| `mappingsAmountLimit`  | `number`, `optional`   Limits max amount of items stored in slices state (to avoid memory leak)  | `undefined`  |
+| `mappingsAmountLimit`  | `number`, `optional`. Limits max amount of items stored in slices state (to avoid memory leak)  | `undefined`  |

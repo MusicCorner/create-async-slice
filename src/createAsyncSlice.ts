@@ -8,6 +8,7 @@ import { Draft } from 'immer';
 
 import {
   isError,
+  isProcessing,
   isSuccess,
   selectAsyncStateError,
   selectAsyncStateValue,
@@ -53,25 +54,29 @@ export const createAsyncSlice = <
     };
   };
 
-  const selectors = selectorsStatePath && {
-    asyncState: (state: SelectorsState) =>
-      state[selectorsStatePath][options.name] as AsyncState<
-        SuccessPayload,
-        ErrorPayload
-      >,
-    value: (state: SelectorsState): SuccessPayload | null =>
-      selectAsyncStateValue(
-        state[selectorsStatePath][options.name]
-      ) as SuccessPayload | null,
-    error: (state: SelectorsState): ErrorPayload | null =>
-      selectAsyncStateError(
-        state[selectorsStatePath][options.name]
-      ) as ErrorPayload | null,
-    isSuccess: (state: SelectorsState) =>
-      isSuccess(state[selectorsStatePath][options.name]),
-    isError: (state: SelectorsState) =>
-      isError(state[selectorsStatePath][options.name]),
-  };
+  const selectors = selectorsStatePath
+    ? {
+        asyncState: (state: SelectorsState) =>
+          state[selectorsStatePath][options.name] as AsyncState<
+            SuccessPayload,
+            ErrorPayload
+          >,
+        value: (state: SelectorsState): SuccessPayload | null =>
+          selectAsyncStateValue(
+            state[selectorsStatePath][options.name]
+          ) as SuccessPayload | null,
+        isProcessing: (state: SelectorsState) =>
+          isProcessing(state[selectorsStatePath][options.name]),
+        error: (state: SelectorsState): ErrorPayload | null =>
+          selectAsyncStateError(
+            state[selectorsStatePath][options.name]
+          ) as ErrorPayload | null,
+        isSuccess: (state: SelectorsState) =>
+          isSuccess(state[selectorsStatePath][options.name]),
+        isError: (state: SelectorsState) =>
+          isError(state[selectorsStatePath][options.name]),
+      }
+    : undefined;
 
   return {
     ...createSlice({
