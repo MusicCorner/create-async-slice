@@ -7,8 +7,7 @@ import {
   isListItemSuccess,
   selectAsyncListStateValue,
   selectListItemError,
-} from '@helpers/selectors';
-
+} from './helpers/selectors';
 import { AsyncState, CreateAsyncSliceOptions } from './createAsyncSlice';
 
 export type AsyncListState<S, E> = {

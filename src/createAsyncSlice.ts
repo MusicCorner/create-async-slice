@@ -12,7 +12,7 @@ import {
   isSuccess,
   selectAsyncStateError,
   selectAsyncStateValue,
-} from '@helpers/selectors';
+} from './helpers/selectors';
 
 export interface AsyncState<SuccessPayload, ErrorPayload> {
   isProcessing: boolean;
