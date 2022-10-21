@@ -28,15 +28,22 @@ export interface CreateAsyncSliceOptions<State> {
   reducers?: ValidateSliceCaseReducers<State, SliceCaseReducers<State>>;
   initialState?: State;
   name: string;
-  selectorsStatePath?: string;
+  selectAsyncState?: (state: any) => State;
 }
+
+export const DEFAULT_ASYNC_STATE = {
+  value: null,
+  error: null,
+  isProcessing: false,
+  isSuccess: false,
+};
 
 export const createAsyncSlice = <
   RequestPayload,
   SuccessPayload = undefined,
   ErrorPayload = undefined
 >({
-  selectorsStatePath,
+  selectAsyncState = () => DEFAULT_ASYNC_STATE,
   ...options
 }: CreateAsyncSliceOptions<
   PartialAsyncState<SuccessPayload, ErrorPayload>
@@ -48,35 +55,29 @@ export const createAsyncSlice = <
     value: null,
   };
 
-  type SelectorsState = {
-    [key: string]: {
-      [key: string]: AsyncState<SuccessPayload, ErrorPayload> | any;
-    };
+  const selectors = {
+    asyncState: selectAsyncState,
+    value: (state: any): SuccessPayload | null =>
+      selectAsyncStateValue(
+        selectAsyncState(state) as AsyncState<SuccessPayload, ErrorPayload>
+      ) as SuccessPayload | null,
+    isProcessing: (state: any) =>
+      isProcessing(
+        selectAsyncState(state) as AsyncState<SuccessPayload, ErrorPayload>
+      ),
+    error: (state: any): ErrorPayload | null =>
+      selectAsyncStateError(
+        selectAsyncState(state) as AsyncState<SuccessPayload, ErrorPayload>
+      ) as ErrorPayload | null,
+    isSuccess: (state: any) =>
+      isSuccess(
+        selectAsyncState(state) as AsyncState<SuccessPayload, ErrorPayload>
+      ),
+    isError: (state: any) =>
+      isError(
+        selectAsyncState(state) as AsyncState<SuccessPayload, ErrorPayload>
+      ),
   };
-
-  const selectors = selectorsStatePath
-    ? {
-        asyncState: (state: SelectorsState) =>
-          state[selectorsStatePath][options.name] as AsyncState<
-            SuccessPayload,
-            ErrorPayload
-          >,
-        value: (state: SelectorsState): SuccessPayload | null =>
-          selectAsyncStateValue(
-            state[selectorsStatePath][options.name]
-          ) as SuccessPayload | null,
-        isProcessing: (state: SelectorsState) =>
-          isProcessing(state[selectorsStatePath][options.name]),
-        error: (state: SelectorsState): ErrorPayload | null =>
-          selectAsyncStateError(
-            state[selectorsStatePath][options.name]
-          ) as ErrorPayload | null,
-        isSuccess: (state: SelectorsState) =>
-          isSuccess(state[selectorsStatePath][options.name]),
-        isError: (state: SelectorsState) =>
-          isError(state[selectorsStatePath][options.name]),
-      }
-    : undefined;
 
   return {
     ...createSlice({

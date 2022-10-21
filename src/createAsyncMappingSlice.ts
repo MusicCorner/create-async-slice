@@ -38,7 +38,7 @@ export const createAsyncMappingSlice = <
   SuccessPayload extends DefaultListSuccessPayload<SuccessValue> = DefaultListSuccessPayload<SuccessValue>,
   ErrorPayload extends DefaultListErrorPayload<ErrorValue> = DefaultListErrorPayload<ErrorValue>
 >({
-  selectorsStatePath,
+  selectAsyncState = () => ({}),
   mappingsAmountLimit,
   ...options
 }: CreateAsyncMappingsOptions<AsyncListState<SuccessValue, ErrorValue>>) => {
@@ -51,52 +51,38 @@ export const createAsyncMappingSlice = <
     // }
   };
 
-  const selectors = selectorsStatePath
-    ? {
-        asyncListState: (state: SelectorsState) =>
-          state[selectorsStatePath][options.name] as AsyncListState<
-            SuccessValue,
-            ErrorValue
-          >,
-        asyncState: (state: SelectorsState, payload: DefaultListPayload) =>
-          (
-            state[selectorsStatePath][options.name] as AsyncListState<
-              SuccessValue,
-              ErrorValue
-            >
-          )[payload.id],
-        value: (
-          state: SelectorsState,
-          payload: DefaultListPayload
-        ): SuccessPayload =>
-          selectAsyncListStateValue(
-            state[selectorsStatePath][options.name],
-            payload
-          ) as SuccessPayload,
-        isProcessing: (state: SelectorsState, payload: DefaultListPayload) =>
-          isListItemProcessing(
-            state[selectorsStatePath][options.name],
-            payload
-          ),
-        error: (
-          state: SelectorsState,
-          payload: DefaultListPayload
-        ): ErrorPayload =>
-          selectListItemError(
-            state[selectorsStatePath][options.name],
-            payload
-          ) as ErrorPayload,
-        isSuccess: (state: SelectorsState, payload: DefaultListPayload) =>
-          isListItemSuccess(state[selectorsStatePath][options.name], payload),
-        isError: (state: SelectorsState, payload: DefaultListPayload) =>
-          isListItemError(state[selectorsStatePath][options.name], payload),
-      }
-    : undefined;
-
-  type SelectorsState = {
-    [key: string]: {
-      [key: string]: AsyncListState<SuccessValue, ErrorValue> | any;
-    };
+  const selectors = {
+    asyncListState: (state: any) =>
+      selectAsyncState(state) as AsyncListState<SuccessValue, ErrorValue>,
+    asyncState: (state: any, payload: DefaultListPayload) =>
+      (selectAsyncState(state) as AsyncListState<SuccessValue, ErrorValue>)[
+        payload.id
+      ],
+    value: (state: any, payload: DefaultListPayload): SuccessPayload =>
+      selectAsyncListStateValue(
+        selectAsyncState(state) as AsyncListState<SuccessValue, ErrorValue>,
+        payload
+      ) as SuccessPayload,
+    isProcessing: (state: any, payload: DefaultListPayload) =>
+      isListItemProcessing(
+        selectAsyncState(state) as AsyncListState<SuccessValue, ErrorValue>,
+        payload
+      ),
+    error: (state: any, payload: DefaultListPayload): ErrorPayload =>
+      selectListItemError(
+        selectAsyncState(state) as AsyncListState<SuccessValue, ErrorValue>,
+        payload
+      ) as ErrorPayload,
+    isSuccess: (state: any, payload: DefaultListPayload) =>
+      isListItemSuccess(
+        selectAsyncState(state) as AsyncListState<SuccessValue, ErrorValue>,
+        payload
+      ),
+    isError: (state: any, payload: DefaultListPayload) =>
+      isListItemError(
+        selectAsyncState(state) as AsyncListState<SuccessValue, ErrorValue>,
+        payload
+      ),
   };
 
   return {
