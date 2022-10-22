@@ -178,7 +178,7 @@ export const User = ({ id, name }) => {
 
 | Option key | Description | Default Value |
 | ------------- | ------------- | ------------- |
-| `selectorsStatePath`  | `string`, `optional`. Redux state key for selector. E.g: `selectorsStatePath`: `'users'` will make all selectors in this slice be `state => state.users[asyncSliceName]`  | `undefined` |
+| `selectAsyncState`  | `(state) => AsyncState`, `optional`. Redux selector which returns your async slice state (needed for using `createAsyncSlice({ ... }).selectors`). E.g: `selectAsyncState`: `(state) => state.users.getUsers` |
 
 ___
 `createAsyncMappingsSlice` accepts all `createAsyncSlice` options and following:
