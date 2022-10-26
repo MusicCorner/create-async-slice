@@ -56,13 +56,16 @@ import { createAsyncSlice } from 'create-async-slice';
 
 export const getUsersSlice = createAsyncSlice<RequestPayload, SuccessPayload, ErrorPayload>({
   name: 'getUsers',
-  selectorsStatePath: 'users'
+  selectAsyncState: (state) => state.users.getUsers // To get `getUsersSlice.selectors` work
 });
 
 /* RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId:
 these are optional since we always should pass an id of parent list by default
 */
-export const getUserCompaniesSlice = createAsyncMappingSlice<RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId>({ name: 'getCompaiesByUserId', selectorsStatePath: 'users' })
+export const getUserCompaniesSlice = createAsyncMappingSlice<RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId>({
+  name: 'getCompaiesByUserId',
+  selectAsyncState: (state) => state.users.getCompaiesByUserId // To get `getUsersSlice.selectors` work
+})
 
 export const usersReducer = combineReducers({
   getUsers: getUsersSlice.reducer,
