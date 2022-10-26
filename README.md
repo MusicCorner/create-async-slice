@@ -64,7 +64,7 @@ these are optional since we always should pass an id of parent list by default
 */
 export const getUserCompaniesSlice = createAsyncMappingSlice<RequestPayloadWithId, SuccessPayloadWithId, ErrorPayloadWithId>({
   name: 'getCompaiesByUserId',
-  selectAsyncState: (state) => state.users.getCompaiesByUserId // To get `getUsersSlice.selectors` work
+  selectAsyncState: (state) => state.users.getCompaiesByUserId // To get `getUserCompaniesSlice.selectors` work
 })
 
 export const usersReducer = combineReducers({
