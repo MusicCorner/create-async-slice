@@ -58,21 +58,21 @@ export const createAsyncMappingSlice = <
       (selectAsyncState(state) as AsyncListState<SuccessValue, ErrorValue>)[
         payload.id
       ],
-    value: (state: any, payload: DefaultListPayload): SuccessPayload =>
+    value: (state: any, payload: DefaultListPayload): SuccessValue =>
       selectAsyncListStateValue(
         selectAsyncState(state) as AsyncListState<SuccessValue, ErrorValue>,
         payload
-      ) as SuccessPayload,
+      ) as SuccessValue,
     isProcessing: (state: any, payload: DefaultListPayload) =>
       isListItemProcessing(
         selectAsyncState(state) as AsyncListState<SuccessValue, ErrorValue>,
         payload
       ),
-    error: (state: any, payload: DefaultListPayload): ErrorPayload =>
+    error: (state: any, payload: DefaultListPayload): ErrorValue =>
       selectListItemError(
         selectAsyncState(state) as AsyncListState<SuccessValue, ErrorValue>,
         payload
-      ) as ErrorPayload,
+      ) as ErrorValue,
     isSuccess: (state: any, payload: DefaultListPayload) =>
       isListItemSuccess(
         selectAsyncState(state) as AsyncListState<SuccessValue, ErrorValue>,
